@@ -153,8 +153,7 @@ var Game = function (_React$Component2) {
                     active: false,
                     winner: 'Wygrał ' + oldSign + '!'
                 });
-            }
-            if (this.isTie()) {
+            } else if (this.isTie()) {
                 this.setState({
                     active: false,
                     winner: 'Remis!'
@@ -164,7 +163,20 @@ var Game = function (_React$Component2) {
     }, {
         key: "render",
         value: function render() {
-            return React.createElement(Board, { board: this.state.board, sign: this.state.sign, updater: this.updateGame, winner: this.state.winner });
+            return React.createElement(
+                "div",
+                { className: "row" },
+                React.createElement(
+                    "div",
+                    { className: "col-sm-9" },
+                    React.createElement(Board, { board: this.state.board, sign: this.state.sign, updater: this.updateGame, winner: this.state.winner })
+                ),
+                React.createElement(
+                    "div",
+                    { className: "col-sm-3" },
+                    "History Here"
+                )
+            );
         }
     }]);
 

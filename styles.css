@@ -9,6 +9,10 @@ thead{
     color: blue;
 }
 
+th{
+    text-align: center;
+}
+
 td{
     border: 2px solid black;
     width: 80px;
