@@ -37,8 +37,55 @@ function EndCommand(props) {
     return null;
 }
 
-var Board = function (_React$Component) {
-    _inherits(Board, _React$Component);
+var HistoryPanel = function (_React$Component) {
+    _inherits(HistoryPanel, _React$Component);
+
+    function HistoryPanel(props) {
+        _classCallCheck(this, HistoryPanel);
+
+        return _possibleConstructorReturn(this, (HistoryPanel.__proto__ || Object.getPrototypeOf(HistoryPanel)).call(this, props));
+    }
+
+    _createClass(HistoryPanel, [{
+        key: "render",
+        value: function render() {
+            var _this2 = this;
+
+            boardsArr = this.props.boardsArr;
+            boardsButtons = [];
+
+            var _loop = function _loop(i) {
+                boardsButtons.push(React.createElement(
+                    "button",
+                    { className: "backmove", onClick: function onClick() {
+                            return _this2.props.degrader(i);
+                        } },
+                    "Ruch ",
+                    i
+                ));
+            };
+
+            for (var i = 0; i < boardsArr.length; i++) {
+                _loop(i);
+            }
+            return React.createElement(
+                "div",
+                { className: "col-sm-3 history" },
+                React.createElement(
+                    "p",
+                    null,
+                    " Cofanie do ruchu "
+                ),
+                boardsButtons
+            );
+        }
+    }]);
+
+    return HistoryPanel;
+}(React.Component);
+
+var Board = function (_React$Component2) {
+    _inherits(Board, _React$Component2);
 
     function Board(props) {
         _classCallCheck(this, Board);
@@ -64,7 +111,7 @@ var Board = function (_React$Component) {
             }
             return React.createElement(
                 "div",
-                null,
+                { className: "col-sm-9" },
                 React.createElement(
                     "table",
                     null,
@@ -95,22 +142,24 @@ var Board = function (_React$Component) {
     return Board;
 }(React.Component);
 
-var Game = function (_React$Component2) {
-    _inherits(Game, _React$Component2);
+var Game = function (_React$Component3) {
+    _inherits(Game, _React$Component3);
 
     function Game(props) {
         _classCallCheck(this, Game);
 
-        var _this2 = _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).call(this, props));
+        var _this4 = _possibleConstructorReturn(this, (Game.__proto__ || Object.getPrototypeOf(Game)).call(this, props));
 
-        _this2.state = {
+        _this4.state = {
             board: [[null, null, null], [null, null, null], [null, null, null]],
             sign: 'O',
             active: true,
-            winner: undefined
+            winner: undefined,
+            history: [[[null, null, null], [null, null, null], [null, null, null]]]
         };
-        _this2.updateGame = _this2.updateGame.bind(_this2);
-        return _this2;
+        _this4.updateGame = _this4.updateGame.bind(_this4);
+        _this4.undoMoves = _this4.undoMoves.bind(_this4);
+        return _this4;
     }
 
     _createClass(Game, [{
@@ -137,11 +186,32 @@ var Game = function (_React$Component2) {
             return true;
         }
     }, {
+        key: "undoMoves",
+        value: function undoMoves(returnTo) {
+            while (this.state.history.length > returnTo + 1) {
+                this.state.history.pop();
+            }
+            actBoard = this.state.history[returnTo].map(function (arr) {
+                return arr.slice();
+            });
+            nextSign = returnTo % 2 === 0 ? 'O' : 'X';
+            this.setState({
+                board: actBoard,
+                sign: nextSign,
+                active: true,
+                winner: undefined
+            });
+        }
+    }, {
         key: "updateGame",
         value: function updateGame(row, col) {
             if (this.state.board[row][col] != null || !this.state.active) return;
             newBoard = this.state.board;
             newBoard[row][col] = this.state.sign;
+            historyElem = this.state.board.map(function (arr) {
+                return arr.slice();
+            });
+            this.state.history.push(historyElem);
             oldSign = this.state.sign;
             newSign = this.state.sign === 'O' ? 'X' : 'O';
             this.setState({
@@ -166,16 +236,8 @@ var Game = function (_React$Component2) {
             return React.createElement(
                 "div",
                 { className: "row" },
-                React.createElement(
-                    "div",
-                    { className: "col-sm-9" },
-                    React.createElement(Board, { board: this.state.board, sign: this.state.sign, updater: this.updateGame, winner: this.state.winner })
-                ),
-                React.createElement(
-                    "div",
-                    { className: "col-sm-3" },
-                    "History Here"
-                )
+                React.createElement(Board, { board: this.state.board, sign: this.state.sign, updater: this.updateGame, winner: this.state.winner }),
+                React.createElement(HistoryPanel, { boardsArr: this.state.history, degrader: this.undoMoves })
             );
         }
     }]);
